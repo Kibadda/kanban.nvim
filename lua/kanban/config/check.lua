@@ -30,7 +30,7 @@ function M.validate(config)
     KanbanBorder = { config.highlights.KanbanBorder, "table", true },
     KanbanBorderCurrent = { config.highlights.KanbanBorderCurrent, "table", true },
     KanbanTitle = { config.highlights.KanbanTitle, "table", true },
-    KanbanTime = { config.highlights.KanbanTime, "table", true },
+    KanbanLabel = { config.highlights.KanbanTime, "table", true },
   })
   if not ok then
     return false, err
@@ -39,7 +39,6 @@ function M.validate(config)
   if config.adapters.gitlab then
     ok, err = validate("kanban.adapters.gitlab", {
       token = { config.adapters.gitlab.token, "string" },
-      board = { config.adapters.gitlab.board, "string" },
       project = { config.adapters.gitlab.project, "string" },
       labels = { config.adapters.gitlab.labels, "table", true },
       default = { config.adapters.gitlab.default, "boolean", true },

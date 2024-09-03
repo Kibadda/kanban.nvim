@@ -2,14 +2,15 @@
 ---@field KanbanBorder? vim.api.keyset.highlight
 ---@field KanbanBorderCurrent? vim.api.keyset.highlight
 ---@field KanbanTitle? vim.api.keyset.highlight
----@field KanbanTime? vim.api.keyset.highlight
+---@field KanbanLabel? vim.api.keyset.highlight
 
 ---@class kanban.config.adapters.gitlab
 ---@field token string
----@field board string
 ---@field project string
+---@field boardId? integer
 ---@field labels? string[]
 ---@field default? boolean
+---@field current? fun(name: string): string
 
 ---@class kanban.config.adapters
 ---@field gitlab? kanban.config.adapters.gitlab
@@ -28,7 +29,7 @@ local KanbanDefaultConfig = {
     KanbanBorder = { fg = "#D4BE98" },
     KanbanBorderCurrent = { fg = "#89B482" },
     KanbanTitle = { fg = "#EA6962" },
-    KanbanTime = { fg = "#7DAEA3" },
+    KanbanLabel = { fg = "#7DAEA3" },
   },
 }
 
