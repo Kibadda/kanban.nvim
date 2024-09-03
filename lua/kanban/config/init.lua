@@ -21,6 +21,7 @@
 ---@class kanban.internalconfig
 ---@field adapters kanban.config.adapters
 local KanbanDefaultConfig = {
+  ---@type string?
   adapter = nil,
   adapters = {},
   highlights = {
