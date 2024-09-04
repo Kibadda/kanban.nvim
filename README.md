@@ -9,10 +9,11 @@ vim.g.kanban = {
   adapter = nil,
   adapters = {},
   highlights = {
-    KanbanBorder = { fg = "#D4BE98" },
-    KanbanBorderCurrent = { fg = "#89B482" },
-    KanbanTitle = { fg = "#EA6962" },
-    KanbanLabel = { fg = "#7DAEA3" },
+    ListTitle = { fg = "#89B482" },
+    ListBorder = { fg = "#D4BE98" },
+    ListBorderFocused = { fg = "#EA6962" },
+    TaskBorder = { fg = "#D4BE98" },
+    TaskBorderFocused = { fg = "#EA6962" },
   },
 }
 ```

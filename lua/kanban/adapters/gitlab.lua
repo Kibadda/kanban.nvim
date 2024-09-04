@@ -18,7 +18,7 @@ local function request(url)
   })
 end
 
-function M.lists()
+local function board()
   local boards = request "boards"
 
   if not boards then
@@ -28,76 +28,85 @@ function M.lists()
   local gitlab_config = M.config()
   local boardId = gitlab_config and gitlab_config.boardId
 
-  local board
-  if #boards == 1 or not boardId then
-    board = boards[1]
-  else
+  if boardId then
     for _, b in ipairs(boards) do
       if b.id == boardId then
-        board = b
-        break
+        return b
       end
     end
+  elseif boards[1] then
+    return boards[1]
   end
-
-  if not board then
-    return
-  end
-
-  local labels = {}
-
-  for _, l in ipairs(board.lists) do
-    table.insert(labels, l.label.name)
-  end
-
-  table.insert(labels, 1, "Open")
-  table.insert(labels, "Closed")
-
-  return labels
 end
 
-function M.tasks()
-  local issues = request "issues"
+local function labels()
+  local ls = {}
 
-  if not issues then
-    return {}
+  for _, label in ipairs(request "labels" or {}) do
+    ls[label.name] = {
+      fg = label.text_color,
+      bg = label.color,
+    }
   end
 
-  local lists = M.lists()
+  return ls
+end
 
-  if not lists then
-    return {}
-  end
+local function tasks(lists)
+  local mapping = {}
 
-  local tasks = {}
-
-  for _, i in ipairs(issues) do
+  for _, task in ipairs(request "issues" or {}) do
     local list = "Open"
-    local labels = {}
+    local ls = {}
 
-    for _, l in ipairs(i.labels) do
-      if vim.tbl_contains(lists, l) then
-        list = l
+    for _, label in ipairs(task.labels) do
+      if vim.list_contains(lists, label) then
+        list = label
       else
-        table.insert(labels, l)
+        table.insert(ls, label)
       end
     end
 
-    if i.state == "closed" then
+    if task.state == "closed" then
       list = "Closed"
     end
 
-    table.insert(tasks, {
-      id = i.iid,
-      title = i.title,
-      list = list,
-      labels = labels,
-      -- description = i.description ~= vim.NIL and i.description or nil,
-      -- time = i.time_stats.total_time_spent ~= vim.NIL and math.floor(i.time_stats.total_time_spent / 60) or 0,
+    mapping[list] = mapping[list] or {}
+    table.insert(mapping[list], {
+      title = task.title,
+      labels = ls,
     })
   end
 
-  return tasks
+  for i, list in ipairs(lists) do
+    lists[i] = {
+      title = list,
+      tasks = mapping[list] or {},
+    }
+  end
+end
+
+---@return kanban.api.board?
+function M.get()
+  local board_data = board()
+
+  if not board_data then
+    return
+  end
+
+  local lists = vim.tbl_map(function(list)
+    return list.label.name
+  end, board_data.lists)
+  table.insert(lists, 1, "Open")
+  table.insert(lists, "Closed")
+
+  tasks(lists)
+
+  return {
+    title = board_data.name,
+    lists = lists,
+    labels = labels(),
+  }
 end
 
 return M

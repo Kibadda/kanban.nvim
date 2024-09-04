@@ -1,5 +1,18 @@
 local M = {}
 
+---@class kanban.api.board
+---@field title string
+---@field labels table<string, { fg: string, bg: string }>
+---@field lists kanban.api.list[]
+
+---@class kanban.api.list
+---@field title string
+---@field tasks kanban.api.task[]
+
+---@class kanban.api.task
+---@field title string
+---@field labels string[]
+
 ---@param data table
 function M.open(data)
   local cmd = table.remove(data.fargs, 1)
@@ -13,9 +26,20 @@ function M.open(data)
     return
   end
 
-  local windows = require "kanban.windows"
+  local gitlab = require "kanban.adapters.gitlab"
+  local board = gitlab.get()
+  local initial_focus = gitlab.config().initial_focus
 
-  windows.show()
+  if not board then
+    return
+  end
+
+  -- TODO: add title of board
+  local Board = require("kanban.board").new {
+    data = board,
+    initial_focus = initial_focus,
+  }
+  Board:display()
 end
 
 ---@param cmdline string

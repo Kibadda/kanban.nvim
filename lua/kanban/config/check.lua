@@ -27,10 +27,11 @@ function M.validate(config)
   end
 
   ok, err = validate("kanban.highlights", {
-    KanbanBorder = { config.highlights.KanbanBorder, "table", true },
-    KanbanBorderCurrent = { config.highlights.KanbanBorderCurrent, "table", true },
-    KanbanTitle = { config.highlights.KanbanTitle, "table", true },
-    KanbanLabel = { config.highlights.KanbanTime, "table", true },
+    ListTitle = { config.highlights.ListTitle, "table", true },
+    ListBorder = { config.highlights.ListBorder, "table", true },
+    ListBorderFocused = { config.highlights.ListBorderFocused, "table", true },
+    TaskBorder = { config.highlights.TaskBorder, "table", true },
+    TaskBorderFocused = { config.highlights.TaskBorderFocused, "table", true },
   })
   if not ok then
     return false, err
@@ -40,8 +41,9 @@ function M.validate(config)
     ok, err = validate("kanban.adapters.gitlab", {
       token = { config.adapters.gitlab.token, "string" },
       project = { config.adapters.gitlab.project, "string" },
-      labels = { config.adapters.gitlab.labels, "table", true },
+      boardId = { config.adapters.gitlab.boardId, "number", true },
       default = { config.adapters.gitlab.default, "boolean", true },
+      initial_focus = { config.adapters.gitlab.initial_focus, "function", true },
     })
     if not ok then
       return false, err
