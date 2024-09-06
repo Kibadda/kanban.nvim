@@ -11,7 +11,7 @@
 ---@class kanban.list
 ---@field new fun(opts: kanban.list.options): kanban.list
 ---@field display fun(self: kanban.list, opts: kanban.list.dimensions)
----@field create_window fun(self: kanban.list, opts: kanban.list.dimensions)
+---@field dimensions kanban.list.dimensions
 ---@field tasks kanban.task[]
 ---@field focused_task number
 ---@field buf number
@@ -22,17 +22,17 @@
 local M = {}
 M.__index = M
 
-function M:create_window(opts)
+function M:create_window()
   self.buf = vim.api.nvim_create_buf(false, true)
   self.win = vim.api.nvim_open_win(self.buf, false, {
     relative = "editor",
     border = "single",
     title = " " .. self.title .. " ",
     title_pos = "center",
-    height = opts.height,
-    width = opts.width,
+    height = self.dimensions.height,
+    width = self.dimensions.width,
     row = 1,
-    col = opts.col,
+    col = self.dimensions.col,
     style = "minimal",
   })
   vim.wo[self.win].winhighlight = "FloatTitle:KanbanListTitle,FloatBorder:KanbanListBorder"
@@ -56,18 +56,21 @@ function M:set_keymaps()
   end, "Focus previous list")
 end
 
-function M:display(opts)
-  self:create_window(opts)
-
+function M:display_tasks()
   local row = 0
   for _, task in ipairs(self.tasks) do
     task:display {
-      width = opts.width,
+      width = self.dimensions.width,
       row = row,
     }
     row = row + task.height
   end
+end
 
+function M:display(opts)
+  self.dimensions = opts
+  self:create_window()
+  self:display_tasks()
   self:set_keymaps()
 end
 
@@ -86,6 +89,31 @@ function M:unfocus()
   if self.tasks[self.focused_task] then
     vim.wo[self.tasks[self.focused_task].win].winhighlight = "FloatBorder:KanbanTaskBorder"
   end
+end
+
+---@param tasks kanban.api.task[]
+function M:update(tasks)
+  for _, task in ipairs(self.tasks) do
+    task:destroy()
+  end
+
+  self.tasks = {}
+  local Task = require "kanban.task"
+  for i, task in ipairs(tasks) do
+    self.tasks[i] = Task.new {
+      index = i,
+      list = self,
+      data = task,
+    }
+  end
+
+  if self.tasks[1] then
+    self.focused_task = 1
+  else
+    self.focused_task = nil
+  end
+
+  self:display_tasks()
 end
 
 ---@param direction 1|-1

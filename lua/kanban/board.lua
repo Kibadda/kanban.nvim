@@ -103,6 +103,14 @@ function M:destroy()
   vim.cmd.tabclose()
 end
 
+function M:update_lists(lists)
+  for _, list in ipairs(self.lists) do
+    if vim.tbl_contains(lists, list.title) then
+      list:update(self.source.tasks_by_list(list.title))
+    end
+  end
+end
+
 function M.new(opts)
   local board = setmetatable({
     title = opts.data.title,

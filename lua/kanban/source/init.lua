@@ -2,6 +2,7 @@
 ---@field data fun(): table
 ---@field config kanban.config.source
 ---@field move_task_to_list fun(task: kanban.task, list: string)
+---@field tasks_by_list fun(list: string): table
 
 local M = {}
 

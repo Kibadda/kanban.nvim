@@ -1,11 +1,12 @@
-local M = {}
+---@type kanban.source
+local M = {} ---@diagnostic disable-line:missing-fields
 
-local function request(url)
+local function request(url, data)
   local curl = require "kanban.curl"
 
   return curl.request("GET", vim.env[M.config.data.project] .. "/" .. url, {
     ["PRIVATE-TOKEN"] = vim.env[M.config.data.token],
-  })
+  }, data)
 end
 
 local function board()
@@ -81,7 +82,7 @@ function M.data()
   local board_data = board()
 
   if not board_data then
-    return
+    return nil
   end
 
   local lists = vim.tbl_map(function(list)
@@ -119,6 +120,22 @@ function M.move_task_to_list(task, list)
     state_event = task.list.title == "Closed" and "reopen" or (list == "Closed" and "close" or nil),
     labels = ls,
   })
+end
+
+function M.tasks_by_list(list)
+  local ts = {}
+
+  for _, task in ipairs(request("issues", { state = "opened", labels = list }) or {}) do
+    table.insert(ts, {
+      title = task.title,
+      labels = vim.tbl_filter(function(label)
+        return label ~= list
+      end, task.labels),
+      api_url = task._links.self,
+    })
+  end
+
+  return ts
 end
 
 return M

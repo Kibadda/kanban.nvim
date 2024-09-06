@@ -60,6 +60,11 @@ function M:set_keymaps()
         end
 
         self.list.board.source.move_task_to_list(self, choice)
+
+        vim.schedule(function()
+          self.list.board:update_lists { self.list.title, choice }
+          self.list:focus()
+        end)
       end
     )
   end)
