@@ -71,6 +71,7 @@ local function tasks(lists)
     table.insert(mapping[list], {
       title = task.title,
       labels = ls,
+      api_url = task._links.self,
     })
   end
 
@@ -103,6 +104,25 @@ function M.data()
     lists = lists,
     labels = labels(),
   }
+end
+
+---@param task kanban.task
+function M.move_task_to_list(task, list)
+  local curl = require "kanban.curl"
+
+  local gitlab_config = M.config()
+
+  local ls = vim.deepcopy(task.labels)
+  if list ~= "Open" and list ~= "Closed" then
+    table.insert(ls, list)
+  end
+
+  curl.request("PUT", task.api_url, {
+    ["PRIVATE-TOKEN"] = vim.env[gitlab_config.token],
+  }, {
+    state_event = task.list.title == "Closed" and "reopen" or (list == "Closed" and "close" or nil),
+    labels = ls,
+  })
 end
 
 return M

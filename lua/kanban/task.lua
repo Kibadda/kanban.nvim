@@ -17,6 +17,7 @@
 ---@field list kanban.list
 ---@field title string
 ---@field labels string[]
+---@field api_url string
 local M = {}
 M.__index = M
 
@@ -43,6 +44,24 @@ function M:set_keymaps()
 
   map("k", function()
     self.list:focus_task(-1)
+  end)
+
+  map("m", function()
+    vim.ui.select(
+      vim.tbl_map(function(list)
+        return list.title
+      end, self.list.board.lists),
+      {
+        prompt = "Move to: ",
+      },
+      function(choice)
+        if not choice then
+          return
+        end
+
+        self.list.board.adapter.move_task_to_list(self, choice)
+      end
+    )
   end)
 end
 
@@ -101,6 +120,7 @@ function M.new(opts)
     labels = opts.data.labels,
     index = opts.index,
     list = opts.list,
+    api_url = opts.data.api_url,
   }, M) --[[@as kanban.task]]
 end
 

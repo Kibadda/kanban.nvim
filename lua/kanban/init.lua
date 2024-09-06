@@ -12,6 +12,7 @@ local M = {}
 ---@class kanban.api.task
 ---@field title string
 ---@field labels string[]
+---@field api_url string
 
 ---@param data table
 function M.open(data)

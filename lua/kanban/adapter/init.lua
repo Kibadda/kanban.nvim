@@ -1,6 +1,7 @@
 ---@class kanban.adapter
 ---@field data fun(): table
 ---@field config fun(): table
+---@field move_task_to_list fun(task: kanban.task, list: string)
 
 local M = {}
 

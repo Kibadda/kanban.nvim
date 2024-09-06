@@ -2,6 +2,17 @@ local M = {}
 
 local curl = require "plenary.curl"
 
+---@param str string
+local function urlencode(str)
+  str = str:gsub("\n", "\r\n")
+  str = str:gsub("([^%wäöüß %-%_%.%~])", function(c)
+    return ("%%%02X"):format(c:byte())
+  end)
+  str = str:gsub(" ", "+")
+
+  return str
+end
+
 ---@param method string
 ---@param url string
 ---@param headers table
@@ -20,7 +31,18 @@ function M.request(method, url, headers, data)
 
     local query = {}
     for k, v in pairs(data) do
-      if v ~= nil then
+      if type(v) == "table" then
+        v = table.concat(
+          vim.tbl_map(function(val)
+            return urlencode(val)
+          end, v),
+          ","
+        )
+      elseif type(v) == "string" then
+        v = urlencode(v)
+      end
+
+      if type(v) == "string" or type(v) == "number" then
         table.insert(query, k .. "=" .. v)
       end
     end
