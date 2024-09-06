@@ -26,9 +26,8 @@ function M.open(data)
     return
   end
 
-  local gitlab = require "kanban.adapters.gitlab"
-  local board = gitlab.get()
-  local initial_focus = gitlab.config().initial_focus
+  local adapter = require("kanban.adapter").get(cmd)
+  local board = adapter.data()
 
   if not board then
     return
@@ -37,7 +36,7 @@ function M.open(data)
   -- TODO: add title of board
   local Board = require("kanban.board").new {
     data = board,
-    initial_focus = initial_focus,
+    adapter = adapter,
   }
   Board:display()
 end

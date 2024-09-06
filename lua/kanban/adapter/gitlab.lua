@@ -1,17 +1,13 @@
 local M = {}
 
 function M.config()
-  return require("kanban.config").adapters.gitlab
+  return assert(require("kanban.config").adapters.gitlab, "you need a gitlab config for this adapter to work")
 end
 
 local function request(url)
   local curl = require "kanban.curl"
 
   local gitlab_config = M.config()
-
-  if not gitlab_config then
-    return
-  end
 
   return curl.request("GET", vim.env[gitlab_config.project] .. "/" .. url, {
     ["PRIVATE-TOKEN"] = vim.env[gitlab_config.token],
@@ -26,7 +22,7 @@ local function board()
   end
 
   local gitlab_config = M.config()
-  local boardId = gitlab_config and gitlab_config.boardId
+  local boardId = gitlab_config.boardId
 
   if boardId then
     for _, b in ipairs(boards) do
@@ -87,7 +83,7 @@ local function tasks(lists)
 end
 
 ---@return kanban.api.board?
-function M.get()
+function M.data()
   local board_data = board()
 
   if not board_data then
