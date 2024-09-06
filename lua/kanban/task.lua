@@ -90,30 +90,53 @@ function M:set_keymaps()
   end)
 end
 
+function M:calculate_lines(width)
+  local lines = {}
+  local current_line = ""
+
+  for word in vim.gsplit(self.title, " ", { trimempty = true }) do
+    if current_line == "" and #word > width - 2 then
+      table.insert(lines, " " .. word:sub(1, width - 2))
+      current_line = " " .. word:sub(width - 1)
+    elseif #current_line + #" " + #word > width - 2 then
+      table.insert(lines, current_line)
+      current_line = " " .. word
+    else
+      current_line = current_line .. " " .. word
+    end
+  end
+
+  if current_line ~= "" then
+    table.insert(lines, current_line)
+  end
+
+  return lines
+end
+
 function M:display(opts)
   local ns = vim.api.nvim_create_namespace "Kanban"
-  local lines = { " " .. self.title }
+  local lines = self:calculate_lines(opts.width - 2)
   if self.labels[1] then
     table.insert(lines, "")
   end
 
+  self.height = #lines + 2
   self.buf = vim.api.nvim_create_buf(false, true)
   self.win = vim.api.nvim_open_win(self.buf, false, {
     relative = "win",
     win = self.list.win,
     border = "single",
-    height = #lines,
+    height = self.height - 2,
     width = opts.width - 2,
     row = opts.row,
     col = 0,
     style = "minimal",
   })
   vim.wo[self.win].winhighlight = "FloatTitle:KanbanTaskTitle,FloatBorder:KanbanTaskBorder"
-  self.height = #lines + 2
 
   vim.api.nvim_buf_set_lines(self.buf, 0, -1, false, lines)
   for _, label in ipairs(self.labels) do
-    vim.api.nvim_buf_set_extmark(self.buf, ns, 1, 0, {
+    vim.api.nvim_buf_set_extmark(self.buf, ns, #lines - 1, 0, {
       virt_text = { { " " .. label .. " ", "KanbanLabel" .. label } },
     })
   end
