@@ -82,15 +82,20 @@ function M:display()
   end
 end
 
+function M:get_list_index(direction)
+  local index = self.focused_list + direction
+  if index < 1 then
+    index = #self.lists
+  elseif index > #self.lists then
+    index = 1
+  end
+  return index
+end
+
 ---@param direction 1|-1
 function M:focus_list(direction)
   self.lists[self.focused_list]:unfocus()
-  self.focused_list = self.focused_list + direction
-  if self.focused_list < 1 then
-    self.focused_list = #self.lists
-  elseif self.focused_list > #self.lists then
-    self.focused_list = 1
-  end
+  self.focused_list = self:get_list_index(direction)
   self.lists[self.focused_list]:focus()
 end
 
