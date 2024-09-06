@@ -107,6 +107,10 @@ end
 
 ---@param task kanban.task
 function M.move_task_to_list(task, list)
+  if list == "Open" or list == "Closed" then
+    return false
+  end
+
   local curl = require "kanban.curl"
 
   local ls = vim.deepcopy(task.labels)
@@ -120,6 +124,8 @@ function M.move_task_to_list(task, list)
     state_event = task.list.title == "Closed" and "reopen" or (list == "Closed" and "close" or nil),
     labels = ls,
   })
+
+  return true
 end
 
 function M.tasks_by_list(list)
