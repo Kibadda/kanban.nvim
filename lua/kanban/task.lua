@@ -59,7 +59,7 @@ function M:set_keymaps()
           return
         end
 
-        self.list.board.adapter.move_task_to_list(self, choice)
+        self.list.board.source.move_task_to_list(self, choice)
       end
     )
   end)

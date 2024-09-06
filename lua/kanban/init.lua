@@ -18,26 +18,22 @@ local M = {}
 function M.open(data)
   local cmd = table.remove(data.fargs, 1)
 
-  local config = require "kanban.config"
+  local source = require("kanban.source").get(cmd)
 
-  cmd = cmd or config.adapter
-
-  if not config.adapters[cmd] then
-    vim.notify("adapter '" .. cmd .. "' not found", vim.log.levels.WARN)
+  if not source then
+    vim.notify("source '" .. cmd .. "' not found", vim.log.levels.WARN)
     return
   end
 
-  local adapter = require("kanban.adapter").get(cmd)
-  local board = adapter.data()
+  local board = source.data()
 
   if not board then
     return
   end
 
-  -- TODO: add title of board
   local Board = require("kanban.board").new {
     data = board,
-    adapter = adapter,
+    source = source,
   }
   Board:display()
 end
@@ -48,9 +44,14 @@ function M.complete(cmdline)
   local cmd = cmdline:match "^Kanban%s+(.*)$"
 
   if cmd then
-    local complete = vim.tbl_filter(function(command)
-      return string.find(command, "^" .. cmd) ~= nil
-    end, vim.tbl_keys(require("kanban.config").adapters))
+    local complete = vim.tbl_filter(
+      function(command)
+        return string.find(command, "^" .. cmd) ~= nil
+      end,
+      vim.tbl_map(function(source)
+        return source.name
+      end, require("kanban.config").sources)
+    )
 
     table.sort(complete)
 

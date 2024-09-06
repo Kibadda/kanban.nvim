@@ -1,16 +1,10 @@
 local M = {}
 
-function M.config()
-  return assert(require("kanban.config").adapters.gitlab, "you need a gitlab config for this adapter to work")
-end
-
 local function request(url)
   local curl = require "kanban.curl"
 
-  local gitlab_config = M.config()
-
-  return curl.request("GET", vim.env[gitlab_config.project] .. "/" .. url, {
-    ["PRIVATE-TOKEN"] = vim.env[gitlab_config.token],
+  return curl.request("GET", vim.env[M.config.data.project] .. "/" .. url, {
+    ["PRIVATE-TOKEN"] = vim.env[M.config.data.token],
   })
 end
 
@@ -21,8 +15,7 @@ local function board()
     return
   end
 
-  local gitlab_config = M.config()
-  local boardId = gitlab_config.boardId
+  local boardId = M.config.data.boardId
 
   if boardId then
     for _, b in ipairs(boards) do
@@ -94,8 +87,13 @@ function M.data()
   local lists = vim.tbl_map(function(list)
     return list.label.name
   end, board_data.lists)
-  table.insert(lists, 1, "Open")
-  table.insert(lists, "Closed")
+
+  if not board_data.hide_backlog_list then
+    table.insert(lists, 1, "Open")
+  end
+  if not board_data.hide_closed_list then
+    table.insert(lists, "Closed")
+  end
 
   tasks(lists)
 
@@ -110,15 +108,13 @@ end
 function M.move_task_to_list(task, list)
   local curl = require "kanban.curl"
 
-  local gitlab_config = M.config()
-
   local ls = vim.deepcopy(task.labels)
   if list ~= "Open" and list ~= "Closed" then
     table.insert(ls, list)
   end
 
   curl.request("PUT", task.api_url, {
-    ["PRIVATE-TOKEN"] = vim.env[gitlab_config.token],
+    ["PRIVATE-TOKEN"] = vim.env[M.config.data.token],
   }, {
     state_event = task.list.title == "Closed" and "reopen" or (list == "Closed" and "close" or nil),
     labels = ls,

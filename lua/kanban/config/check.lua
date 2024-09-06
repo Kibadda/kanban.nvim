@@ -20,7 +20,7 @@ function M.validate(config)
 
   ok, err = validate("kanban", {
     highlights = { config.highlights, "table", true },
-    adapters = { config.adapters, "table", true },
+    sources = { config.sources, "table", true },
   })
   if not ok then
     return false, err
@@ -37,21 +37,32 @@ function M.validate(config)
     return false, err
   end
 
-  if config.adapters.gitlab then
-    ok, err = validate("kanban.adapters.gitlab", {
-      token = { config.adapters.gitlab.token, "string" },
-      project = { config.adapters.gitlab.project, "string" },
-      boardId = { config.adapters.gitlab.boardId, "number", true },
-      default = { config.adapters.gitlab.default, "boolean", true },
-      initial_focus = { config.adapters.gitlab.initial_focus, "function", true },
+  if #config.sources == 0 then
+    return false, "invalid config: kanban.sources must have at least one source"
+  end
+
+  for i, source in ipairs(config.sources) do
+    ok, err = validate("kanban.sources." .. i, {
+      type = { source.type, "string" },
+      name = { source.name, "string" },
+      data = { source.data, "table" },
+      default = { source.default, "boolean", true },
+      initial_focus = { source.initial_focus, "function", true },
     })
     if not ok then
       return false, err
     end
 
-    config.adapter = "gitlab"
-  else
-    return false, "invalid config: kanban.adapters must have at least one adapter configured"
+    if source.type == "gitlab" then
+      ok, err = validate("kanban.sources." .. i .. ".data", {
+        token = { source.data.token, "string" },
+        project = { source.data.project, "string" },
+        boardId = { source.data.boardId, "number", true },
+      })
+      if not ok then
+        return false, err
+      end
+    end
   end
 
   return true

@@ -1,28 +1,25 @@
 ---@class kanban.config.highlights
----@field Title? vim.api.keyset.highlight
----@field Border? vim.api.keyset.highlight
----@field BorderFocused? vim.api.keyset.highlight
+---@field ListTitle? vim.api.keyset.highlight
+---@field ListBorder? vim.api.keyset.highlight
+---@field ListBorderFocused? vim.api.keyset.highlight
+---@field TaskBorder? vim.api.keyset.highlight
+---@field TaskBorderFocused? vim.api.keyset.highlight
 
----@class kanban.config.adapters.gitlab
----@field token string
----@field project string
----@field boardId? integer
+---@class kanban.config.source
+---@field type "gitlab"
+---@field name string
+---@field data table
 ---@field default? boolean
----@field initial_focus? fun(name: string): boolean
-
----@class kanban.config.adapters
----@field gitlab? kanban.config.adapters.gitlab
+---@field initial_focus? fun(): boolean
 
 ---@class kanban.config
----@field adapters? kanban.config.adapters
+---@field sources kanban.config.source[]
 ---@field highlights? kanban.config.highlights
 
 ---@class kanban.internalconfig
----@field adapters kanban.config.adapters
+---@field sources kanban.config.source[]
 local KanbanDefaultConfig = {
-  ---@type string?
-  adapter = nil,
-  adapters = {},
+  sources = {},
   highlights = {
     ListTitle = { fg = "#89B482" },
     ListBorder = { fg = "#D4BE98" },

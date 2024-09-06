@@ -1,6 +1,6 @@
 ---@class kanban.board.options
 ---@field data kanban.api.board
----@field adapter kanban.adapter
+---@field source kanban.source
 
 ---@class kanban.board
 ---@field new fun(opts: kanban.board.options): kanban.board
@@ -9,7 +9,7 @@
 ---@field title string
 ---@field lists kanban.list[]
 ---@field focused_list number
----@field adapter kanban.adapter
+---@field source kanban.source
 local M = {}
 M.__index = M
 
@@ -107,14 +107,14 @@ function M.new(opts)
   local board = setmetatable({
     title = opts.data.title,
     lists = {},
-    adapter = opts.adapter,
+    source = opts.source,
   }, M) --[[@as kanban.board]]
 
   if opts.data.lists[1] then
     board.focused_list = 1
   end
 
-  local initial_focus = opts.adapter.config().initial_focus and opts.adapter.config().initial_focus()
+  local initial_focus = opts.source.config.initial_focus and opts.source.config.initial_focus()
 
   local List = require "kanban.list"
   for i, list in ipairs(opts.data.lists) do

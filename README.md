@@ -6,8 +6,7 @@ To change the default configuration, set `vim.g.kanban`.
 Default config:
 ```lua
 vim.g.kanban = {
-  adapter = nil,
-  adapters = {},
+  sources = {},
   highlights = {
     ListTitle = { fg = "#89B482" },
     ListBorder = { fg = "#D4BE98" },
