@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/Kibadda/kanban.nvim/compare/v1.0.0...v1.1.0) (2024-09-09)
+
+
+### Features
+
+* **gitlab:** add ability to move task to open and closed list ([8f980fe](https://github.com/Kibadda/kanban.nvim/commit/8f980fea36ebd10ccd4dfbbd9629179b24fd6e1d))
+* pre-calculate lines ([5ab352c](https://github.com/Kibadda/kanban.nvim/commit/5ab352c1bd7ac0bdc120ed1501aef021181c3a31))
+
 ## 1.0.0 (2024-09-06)
 
 
