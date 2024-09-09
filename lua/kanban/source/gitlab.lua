@@ -9,6 +9,7 @@ local function request(url, data)
   }, data)
 end
 
+---@return { title: string, lists: string [] }?
 local function board()
   local boards = request "boards"
 
@@ -18,15 +19,38 @@ local function board()
 
   local boardId = M.config.data.boardId
 
+  local bo
+
   if boardId then
     for _, b in ipairs(boards) do
       if b.id == boardId then
-        return b
+        bo = b
+        break
       end
     end
   elseif boards[1] then
-    return boards[1]
+    bo = boards[1]
   end
+
+  if not bo then
+    return
+  end
+
+  local lists = vim.tbl_map(function(list)
+    return list.label.name
+  end, bo.lists)
+
+  if not bo.hide_backlog_list then
+    table.insert(lists, 1, "Open")
+  end
+  if not bo.hide_closed_list then
+    table.insert(lists, "Closed")
+  end
+
+  return {
+    title = bo.name,
+    lists = lists,
+  }
 end
 
 local function labels()
@@ -79,38 +103,23 @@ end
 
 ---@return kanban.api.board?
 function M.data()
-  local board_data = board()
+  local bo = board()
 
-  if not board_data then
+  if not bo then
     return nil
   end
 
-  local lists = vim.tbl_map(function(list)
-    return list.label.name
-  end, board_data.lists)
-
-  if not board_data.hide_backlog_list then
-    table.insert(lists, 1, "Open")
-  end
-  if not board_data.hide_closed_list then
-    table.insert(lists, "Closed")
-  end
-
-  tasks(lists)
+  tasks(bo.lists)
 
   return {
-    title = board_data.name,
-    lists = lists,
+    title = bo.title,
+    lists = bo.lists,
     labels = labels(),
   }
 end
 
 ---@param task kanban.task
 function M.move_task_to_list(task, list)
-  if list == "Open" or list == "Closed" then
-    return false
-  end
-
   local curl = require "kanban.curl"
 
   local ls = vim.deepcopy(task.labels)
@@ -131,7 +140,25 @@ end
 function M.tasks_by_list(list)
   local ts = {}
 
-  for _, task in ipairs(request("issues", { state = "opened", labels = list }) or {}) do
+  local data
+  if list == "Closed" then
+    data = request("issues", { state = "closed" }) or {}
+  elseif list == "Open" then
+    local lists = (board() or {}).lists
+    data = vim.tbl_filter(function(task)
+      for _, label in ipairs(task.labels) do
+        if vim.tbl_contains(lists, label) then
+          return false
+        end
+      end
+
+      return true
+    end, request("issues", { state = "opened" }) or {})
+  else
+    data = request("issues", { state = "opened", labels = list }) or {}
+  end
+
+  for _, task in ipairs(data) do
     table.insert(ts, {
       title = task.title,
       labels = vim.tbl_filter(function(label)
