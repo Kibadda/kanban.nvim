@@ -3,6 +3,7 @@
 ---@field config kanban.config.source
 ---@field move_task_to_list fun(task: kanban.task, list: string): boolean
 ---@field tasks_by_list fun(list: string): table
+---@field add_task fun(title: string, labels: string[]): boolean
 
 local M = {}
 

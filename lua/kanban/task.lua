@@ -46,6 +46,10 @@ function M:set_keymaps()
     self.list:focus_task(-1)
   end)
 
+  map("c", function()
+    self.list:add_task()
+  end)
+
   map("H", function()
     local list = self.list.board.lists[self.list.board:get_list_index(-1)]
     if self.list.board.source.move_task_to_list(self, list.title) then

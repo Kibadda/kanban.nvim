@@ -54,6 +54,39 @@ function M:set_keymaps()
   map("l", function()
     self.board:focus_list(1)
   end, "Focus previous list")
+
+  map("c", function()
+    self:add_task()
+  end)
+end
+
+function M:add_task()
+  self.board:restore_cursor()
+  local title
+  vim.ui.input({ prompt = "Title: " }, function(input)
+    title = input
+  end)
+
+  if not title or title == "" then
+    self.board:set_cursor()
+    return
+  end
+
+  local labels
+  vim.ui.input({ prompt = "Labels: " }, function(input)
+    labels = vim.split(input or "", ",")
+  end)
+
+  self.board:set_cursor()
+
+  table.insert(labels, self.title)
+
+  if self.board.source.add_task(title, labels) then
+    vim.schedule(function()
+      self.board:update_lists { self.title }
+      self:focus()
+    end)
+  end
 end
 
 function M:display_tasks()

@@ -15,6 +15,15 @@ M.__index = M
 
 local guicursor
 
+function M:set_cursor()
+  guicursor = vim.go.guicursor
+  vim.go.guicursor = "a:KanbanCursor"
+end
+
+function M:restore_cursor()
+  vim.go.guicursor = guicursor
+end
+
 function M:calculate_dimensions(total)
   local function height()
     -- TODO: should consider enabled winbar. tabline etc
@@ -60,8 +69,7 @@ function M:display()
   self.buf = vim.api.nvim_get_current_buf()
   vim.bo[self.buf].bufhidden = "delete"
   vim.bo[self.buf].buflisted = false
-  guicursor = vim.go.guicursor
-  vim.go.guicursor = "a:KanbanCursor"
+  self:set_cursor()
 
   local dimensions = self:calculate_dimensions(#self.lists)
 
@@ -104,7 +112,7 @@ function M:destroy()
     list:destroy()
   end
 
-  vim.go.guicursor = guicursor
+  self:restore_cursor()
   vim.cmd.tabclose()
 end
 

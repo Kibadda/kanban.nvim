@@ -171,4 +171,19 @@ function M.tasks_by_list(list)
   return ts
 end
 
+function M.add_task(title, ls)
+  local curl = require "kanban.curl"
+
+  curl.request("POST", vim.env[M.config.data.project] .. "/issues", {
+    ["PRIVATE-TOKEN"] = vim.env[M.config.data.token],
+  }, {
+    title = title,
+    labels = vim.tbl_filter(function(l)
+      return l ~= "Open" and l ~= "Closed"
+    end, ls),
+  })
+
+  return true
+end
+
 return M
