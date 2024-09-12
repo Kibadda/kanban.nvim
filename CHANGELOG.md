@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/Kibadda/kanban.nvim/compare/v1.2.0...v1.3.0) (2024-09-12)
+
+
+### Features
+
+* do not reset focused task index on updating list ([52c8dd4](https://github.com/Kibadda/kanban.nvim/commit/52c8dd420276061b2b97e6bf5873e5aed484da18))
+
 ## [1.2.0](https://github.com/Kibadda/kanban.nvim/compare/v1.1.0...v1.2.0) (2024-09-12)
 
 
