@@ -38,6 +38,11 @@ local opts = type(vim.g.kanban) == "function" and vim.g.kanban() or vim.g.kanban
 ---@type kanban.internalconfig
 local KanbanConfig = vim.tbl_deep_extend("force", {}, KanbanDefaultConfig, opts)
 
+-- FIX: highlights should overwrite defaults
+for name, val in pairs(opts.highlights or {}) do
+  KanbanConfig.highlights[name] = val
+end
+
 local check = require "kanban.config.check"
 local ok, err = check.validate(KanbanConfig)
 if not ok then
