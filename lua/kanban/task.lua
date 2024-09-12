@@ -54,6 +54,20 @@ function M:set_keymaps()
     self:edit_task()
   end)
 
+  map("d", function()
+    self.list.board:restore_cursor()
+    if
+      vim.fn.confirm("Delete task '" .. self.title .. "'?", "&Yes\n&No", 2) == 1
+      and self.list.board.source.delete_task(self)
+    then
+      vim.schedule(function()
+        self.list.board:update_lists { self.list.title }
+        self.list:focus()
+      end)
+    end
+    self.list.board:set_cursor()
+  end)
+
   map("H", function()
     local list = self.list.board.lists[self.list.board:get_list_index(-1)]
     if self.list.board.source.move_task_to_list(self, list.title) then

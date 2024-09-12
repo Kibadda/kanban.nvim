@@ -5,6 +5,7 @@
 ---@field tasks_by_list fun(list: string): table
 ---@field add_task fun(title: string, labels: string[]): boolean
 ---@field edit_task fun(task: kanban.task): boolean
+---@field delete_task fun(task: kanban.task): boolean
 
 local M = {}
 

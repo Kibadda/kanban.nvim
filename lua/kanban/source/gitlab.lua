@@ -204,4 +204,14 @@ function M.edit_task(task)
   return true
 end
 
+function M.delete_task(task)
+  local curl = require "kanban.curl"
+
+  curl.request("DELETE", task.api_url, {
+    ["PRIVATE-TOKEN"] = vim.env[M.config.data.token],
+  })
+
+  return true
+end
+
 return M
