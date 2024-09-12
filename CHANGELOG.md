@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0](https://github.com/Kibadda/kanban.nvim/compare/v1.1.0...v1.2.0) (2024-09-12)
+
+
+### Features
+
+* add keymap to create new task ([4ec342a](https://github.com/Kibadda/kanban.nvim/commit/4ec342ac5053631e188dc407b4b9f379b0c80381))
+* add keymap to delete task ([b284367](https://github.com/Kibadda/kanban.nvim/commit/b284367309f5527e827603229b8dbfc13414fedc))
+* add keymap to edit task ([92e5cb1](https://github.com/Kibadda/kanban.nvim/commit/92e5cb1568b90c4cbfcec94daa16fd55c383a6fe))
+
+
+### Bug Fixes
+
+* user highlights not overwriting default highlights ([5a80c85](https://github.com/Kibadda/kanban.nvim/commit/5a80c85530fa9a4916bee3ec6d67ed77cb11be91))
+
 ## [1.1.0](https://github.com/Kibadda/kanban.nvim/compare/v1.0.0...v1.1.0) (2024-09-09)
 
 
