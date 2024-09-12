@@ -140,10 +140,10 @@ function M:update(tasks)
     }
   end
 
-  if self.tasks[1] then
-    self.focused_task = 1
-  else
+  if not self.tasks[1] then
     self.focused_task = nil
+  elseif not self.tasks[self.focused_task] then
+    self.focused_task = #self.tasks
   end
 
   self:display_tasks()
