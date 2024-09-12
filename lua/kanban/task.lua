@@ -50,6 +50,10 @@ function M:set_keymaps()
     self.list:add_task()
   end)
 
+  map("e", function()
+    self:edit_task()
+  end)
+
   map("H", function()
     local list = self.list.board.lists[self.list.board:get_list_index(-1)]
     if self.list.board.source.move_task_to_list(self, list.title) then
@@ -92,6 +96,36 @@ function M:set_keymaps()
       end
     )
   end)
+end
+
+function M:edit_task()
+  self.list.board:restore_cursor()
+  local title
+  vim.ui.input({ prompt = "Title: ", default = self.title }, function(input)
+    title = input
+  end)
+
+  if not title or title == "" then
+    self.list.board:set_cursor()
+    return
+  end
+
+  local labels
+  vim.ui.input({ prompt = "Labels: ", default = table.concat(self.labels, ",") }, function(input)
+    labels = vim.split(input or "", ",")
+  end)
+
+  self.list.board:set_cursor()
+
+  self.title = title
+  self.labels = labels
+
+  if self.list.board.source.edit_task(self) then
+    vim.schedule(function()
+      self.list.board:update_lists { self.list.title }
+      self.list:focus()
+    end)
+  end
 end
 
 function M:calculate_lines(width)

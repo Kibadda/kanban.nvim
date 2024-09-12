@@ -186,4 +186,22 @@ function M.add_task(title, ls)
   return true
 end
 
+function M.edit_task(task)
+  local curl = require "kanban.curl"
+
+  local ls = task.labels
+  if task.list.title ~= "Open" and task.list.title ~= "Closed" then
+    table.insert(ls, task.list.title)
+  end
+
+  curl.request("PUT", task.api_url, {
+    ["PRIVATE-TOKEN"] = vim.env[M.config.data.token],
+  }, {
+    title = task.title,
+    labels = ls,
+  })
+
+  return true
+end
+
 return M
