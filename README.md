@@ -16,5 +16,3 @@ vim.g.kanban = {
   },
 }
 ```
-
-## Usage
