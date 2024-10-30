@@ -41,7 +41,7 @@ end
 ---@param cmdline string
 ---@return string[]?
 function M.complete(cmdline)
-  local cmd = cmdline:match "^Kanban%s+(.*)$"
+  local cmd = cmdline:match "^Ka?n?b?a?n?%s+(.*)$"
 
   if cmd then
     local complete = vim.tbl_filter(
