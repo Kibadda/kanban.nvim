@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/Kibadda/kanban.nvim/compare/v1.3.0...v1.3.1) (2024-10-30)
+
+
+### Bug Fixes
+
+* **cmd:** show completions for abbreviated cmd ([2724f73](https://github.com/Kibadda/kanban.nvim/commit/2724f7333142195310efbca4f9ba3a9e6baca3bb))
+
 ## [1.3.0](https://github.com/Kibadda/kanban.nvim/compare/v1.2.0...v1.3.0) (2024-09-12)
 
 
