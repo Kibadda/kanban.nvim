@@ -37,10 +37,6 @@ function M.validate(config)
     return false, err
   end
 
-  if #config.sources == 0 then
-    return false, "invalid config: kanban.sources must have at least one source"
-  end
-
   for i, source in ipairs(config.sources) do
     ok, err = validate("kanban.sources." .. i, {
       type = { source.type, "string" },

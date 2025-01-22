@@ -21,7 +21,11 @@ function M.open(data)
   local source = require("kanban.source").get(cmd)
 
   if not source then
-    vim.notify("source '" .. cmd .. "' not found", vim.log.levels.WARN)
+    if not cmd then
+      vim.notify("no source configured", vim.log.levels.WARN)
+    else
+      vim.notify("source '" .. cmd .. "' not found", vim.log.levels.WARN)
+    end
     return
   end
 
