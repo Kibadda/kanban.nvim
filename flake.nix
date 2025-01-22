@@ -4,20 +4,36 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+
+    plenary-nvim = {
+      url = "github:nvim-lua/plenary.nvim";
+      flake = false;
+    };
   };
 
   outputs = {
     self,
     nixpkgs,
     flake-utils,
+    plenary-nvim,
     ...
   }: let
     plugin-overlay = final: prev: {
+      plenary-nvim = (final.pkgs.vimUtils.buildVimPlugin {
+        name = "plenary.nvim";
+        src = plenary-nvim;
+      }).overrideAttrs {
+        nvimSkipModule = [
+          "plenary._meta._luassert"
+          "plenary.neorocks.init"
+        ];
+      };
+
       kanban-nvim = (final.pkgs.vimUtils.buildVimPlugin {
         name = "kanban.nvim";
         src = self;
       }).overrideAttrs {
-        doCheck = false;
+        dependencies = [ final.plenary-nvim ];
       };
     };
 
