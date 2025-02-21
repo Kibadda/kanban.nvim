@@ -152,7 +152,7 @@ function M.new(opts)
 
   local normal = vim.api.nvim_get_hl(0, { name = "NormalFloat" })
   for name, hl in pairs(opts.data.labels) do
-    vim.api.nvim_set_hl(0, "KanbanLabel" .. name, { fg = hl.fg, bg = hl.bg })
+    vim.api.nvim_set_hl(0, "KanbanLabel" .. name:gsub("[^a-zA-z]", ""), { fg = hl.fg, bg = hl.bg })
   end
   for name, hl in pairs(require("kanban.config").highlights) do
     vim.api.nvim_set_hl(0, "Kanban" .. name, { fg = hl.fg, bg = normal.bg })
