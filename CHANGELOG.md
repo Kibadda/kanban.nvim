@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.4.0](https://github.com/Kibadda/kanban.nvim/compare/v1.3.1...v1.4.0) (2025-05-22)
+
+
+### Features
+
+* add nix files ([fe300fa](https://github.com/Kibadda/kanban.nvim/commit/fe300fad2a9bbae45dd89922e5ea7235bd3cf3a2))
+
+
+### Bug Fixes
+
+* add plenary.nvim as dependency in nix flake ([5f52bcc](https://github.com/Kibadda/kanban.nvim/commit/5f52bccd8e849a54a84c07e753f11e783bb68d98))
+* only error when invoking :Kanban if no sources are configured ([4e3245a](https://github.com/Kibadda/kanban.nvim/commit/4e3245a05ed2e6954cb5836972edc141d5a04c7b))
+* remove non letter characters from labels before creating hl ([cf3e06c](https://github.com/Kibadda/kanban.nvim/commit/cf3e06c236ffaaba98d889d8e8419567bd8a60a2))
+
 ## [1.3.1](https://github.com/Kibadda/kanban.nvim/compare/v1.3.0...v1.3.1) (2024-10-30)
 
 
