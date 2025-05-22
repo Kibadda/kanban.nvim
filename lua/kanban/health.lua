@@ -1,15 +1,16 @@
 local M = {}
 
 function M.check()
-  vim.health.start "checking config"
+  vim.health.start "config"
 
   local config = require "kanban.config"
   local ok, err = require("kanban.config.check").validate(config)
 
   if ok then
-    vim.health.ok "no errors found in config"
+    vim.health.ok "no errors found"
   else
-    vim.health.error(err or "" .. vim.g.kanban and "" or " This looks like a plugin bug!")
+    table.insert(err, 1, "there are errors in your config:")
+    vim.health.error(table.concat(err, "\n"))
   end
 end
 

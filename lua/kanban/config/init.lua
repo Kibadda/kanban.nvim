@@ -43,10 +43,9 @@ for name, val in pairs(opts.highlights or {}) do
   KanbanConfig.highlights[name] = val
 end
 
-local check = require "kanban.config.check"
-local ok, err = check.validate(KanbanConfig)
+local ok = require("kanban.config.check").validate(KanbanConfig)
 if not ok then
-  vim.notify("kanban: " .. err, vim.log.levels.ERROR)
+  vim.notify("kanban: there are errors in your config. see `:checkhealth kanban`", vim.log.levels.ERROR)
 end
 
 return KanbanConfig

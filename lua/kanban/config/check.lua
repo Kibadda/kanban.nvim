@@ -1,67 +1,54 @@
 local M = {}
 
---- small wrapper around vim.validate
----@param path string
----@param tbl table
----@return boolean
----@return string?
-local function validate(path, tbl)
-  local prefix = "invalid config: "
-  local ok, err = pcall(vim.validate, tbl)
-  return ok or false, prefix .. (err and path .. "." .. err or path)
-end
-
 --- validate given config
 ---@param config kanban.internalconfig
 ---@return boolean
----@return string?
+---@return string[]
 function M.validate(config)
-  local ok, err
+  local errors = {}
 
-  ok, err = validate("kanban", {
-    highlights = { config.highlights, "table", true },
-    sources = { config.sources, "table", true },
-  })
-  if not ok then
-    return false, err
-  end
+  --- small wrapper around vim.validate
+  ---@param name string
+  ---@param value any
+  ---@param types any|any[]
+  ---@param optional? boolean
+  ---@return boolean
+  local function validate(name, value, types, optional)
+    local ok, err = pcall(vim.validate, name, value, types, optional)
 
-  ok, err = validate("kanban.highlights", {
-    ListTitle = { config.highlights.ListTitle, "table", true },
-    ListBorder = { config.highlights.ListBorder, "table", true },
-    ListBorderFocused = { config.highlights.ListBorderFocused, "table", true },
-    TaskBorder = { config.highlights.TaskBorder, "table", true },
-    TaskBorderFocused = { config.highlights.TaskBorderFocused, "table", true },
-  })
-  if not ok then
-    return false, err
-  end
-
-  for i, source in ipairs(config.sources) do
-    ok, err = validate("kanban.sources." .. i, {
-      type = { source.type, "string" },
-      name = { source.name, "string" },
-      data = { source.data, "table" },
-      default = { source.default, "boolean", true },
-      initial_focus = { source.initial_focus, "function", true },
-    })
     if not ok then
-      return false, err
+      table.insert(errors, err)
     end
 
-    if source.type == "gitlab" then
-      ok, err = validate("kanban.sources." .. i .. ".data", {
-        token = { source.data.token, "string" },
-        project = { source.data.project, "string" },
-        boardId = { source.data.boardId, "number", true },
-      })
-      if not ok then
-        return false, err
+    return ok
+  end
+
+  if validate("kanban.highlights", config.highlights, "table", true) and config.highlights then
+    validate("kanban.highlights.ListTitle", config.highlights.ListTitle, "table", true)
+    validate("kanban.highlights.ListBorder", config.highlights.ListBorder, "table", true)
+    validate("kanban.highlights.ListBorderFocused", config.highlights.ListBorderFocused, "table", true)
+    validate("kanban.highlights.TaskBorder", config.highlights.TaskBorder, "table", true)
+    validate("kanban.highlights.TaskBorderFocused", config.highlights.TaskBorderFocused, "table", true)
+  end
+
+  if validate("kanban.sources", config.sources, "table", true) and config.sources then
+    for i, source in ipairs(config.sources) do
+      validate("kanban.sources." .. i .. ".name", source.type, "string")
+      validate("kanban.sources." .. i .. ".data", source.data, "table")
+      validate("kanban.sources." .. i .. ".default", source.default, "boolean", true)
+      validate("kanban.sources." .. i .. ".initial_focus", source.initial_focus, "function", true)
+
+      if validate("kanban.sources." .. i .. ".type", source.type, "string") then
+        if source.type == "gitlab" then
+          validate("kanban.sources." .. i .. ".data.token", source.data.token, "string")
+          validate("kanban.sources." .. i .. ".data.project", source.data.project, "string")
+          validate("kanban.sources." .. i .. ".data.boardId", source.data.boardId, "number", true)
+        end
       end
     end
   end
 
-  return true
+  return #errors == 0, errors
 end
 
 return M
